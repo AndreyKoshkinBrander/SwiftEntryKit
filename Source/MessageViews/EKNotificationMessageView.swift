@@ -15,10 +15,12 @@ final public class EKNotificationMessageView: EKSimpleMessageView {
     private var auxiliaryContent: EKProperty.LabelContent!
     
     private let message: EKNotificationMessage
+    private let centerImageVertically: Bool
     
     // MARK: Setup
-    public init(with message: EKNotificationMessage) {
+    public init(with message: EKNotificationMessage, centerImageVertically: Bool = false) {
         self.message = message
+        self.centerImageVertically = centerImageVertically
         super.init(with: message.simpleMessage)
         setupAuxLabel(with: message.auxiliary)
         layoutContent(with: message.insets)
@@ -45,7 +47,12 @@ final public class EKNotificationMessageView: EKSimpleMessageView {
         
         if let thumbImageView = thumbImageView {
             thumbImageView.layoutToSuperview(.left, offset: insets.contentInsets.left)
-            thumbImageView.layoutToSuperview(.top, offset: insets.contentInsets.top)
+            if centerImageVertically {
+                thumbImageView.layoutToSuperview(.centerY)
+                thumbImageView.layoutToSuperview(.top, relation: .greaterThanOrEqual, offset: 16)
+            } else {
+                thumbImageView.layoutToSuperview(.top, offset: insets.contentInsets.top)
+            }
             messageContentView.layout(.left, to: .right, of: thumbImageView, offset: 12)
             messageContentView.layout(to: .top, of: thumbImageView, offset: 4)
         } else {
