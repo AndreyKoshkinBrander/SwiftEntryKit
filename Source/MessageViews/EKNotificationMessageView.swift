@@ -50,11 +50,12 @@ final public class EKNotificationMessageView: EKSimpleMessageView {
             if centerImageVertically {
                 thumbImageView.layoutToSuperview(.centerY)
                 thumbImageView.layoutToSuperview(.top, relation: .greaterThanOrEqual, offset: 16)
+                messageContentView.layoutToSuperview(.top, offset: insets.contentInsets.top)
             } else {
                 thumbImageView.layoutToSuperview(.top, offset: insets.contentInsets.top)
+                messageContentView.layout(to: .top, of: thumbImageView, offset: 4)
             }
             messageContentView.layout(.left, to: .right, of: thumbImageView, offset: 12)
-            messageContentView.layout(to: .top, of: thumbImageView, offset: 4)
         } else {
             messageContentView.layoutToSuperview(.left, offset: insets.contentInsets.left)
             messageContentView.layoutToSuperview(.top, offset: insets.contentInsets.top)

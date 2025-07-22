@@ -12,23 +12,24 @@ public class EKMessageContentView: UIView {
     
     // MARK: Properties
     
+    private let stackView = UIStackView()
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
     
     private var horizontalConstraints: QLAxisConstraints!
     private var topConstraint: NSLayoutConstraint!
-    private var bottomConstraint: NSLayoutConstraint!
-    private var labelsOffsetConstraint: NSLayoutConstraint!
         
     public var titleContent: EKProperty.LabelContent! {
         didSet {
             titleLabel.content = titleContent
+            titleLabel.isHidden = titleContent.text.isEmpty
         }
     }
     
     public var subtitleContent: EKProperty.LabelContent! {
         didSet {
             subtitleLabel.content = subtitleContent
+            subtitleLabel.isHidden = subtitleContent.text.isEmpty
         }
     }
     
@@ -59,7 +60,6 @@ public class EKMessageContentView: UIView {
     public var verticalMargins: CGFloat = 20 {
         didSet {
             topConstraint.constant = verticalMargins
-            bottomConstraint.constant = -verticalMargins
             layoutIfNeeded()
         }
     }
@@ -74,7 +74,7 @@ public class EKMessageContentView: UIView {
     
     public var labelsOffset: CGFloat = 8 {
         didSet {
-            labelsOffsetConstraint.constant = labelsOffset
+            stackView.spacing = labelsOffset
             layoutIfNeeded()
         }
     }
@@ -84,6 +84,7 @@ public class EKMessageContentView: UIView {
     public init() {
         super.init(frame: UIScreen.main.bounds)
         clipsToBounds = true
+        setupStackView()
         setupTitleLabel()
         setupSubtitleLabel()
     }
@@ -92,19 +93,26 @@ public class EKMessageContentView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func setupStackView() {
+        addSubview(stackView)
+        topConstraint = stackView.layoutToSuperview(.top,
+                                                    relation: .greaterThanOrEqual,
+                                                    offset: verticalMargins)
+        horizontalConstraints = stackView.layoutToSuperview(axis: .horizontally, offset: horizontalMargins)
+        stackView.layoutToSuperview(.centerY)
+        
+        stackView.spacing = labelsOffset
+        stackView.axis = .vertical
+        stackView.distribution = .fillProportionally
+    }
+    
     private func setupTitleLabel() {
-        addSubview(titleLabel)
-        topConstraint = titleLabel.layoutToSuperview(.top, offset: verticalMargins)
-        horizontalConstraints = titleLabel.layoutToSuperview(axis: .horizontally, offset: horizontalMargins)
+        stackView.addArrangedSubview(titleLabel)
         titleLabel.forceContentWrap(.vertically)
     }
     
     private func setupSubtitleLabel() {
-        addSubview(subtitleLabel)
-        labelsOffsetConstraint = subtitleLabel.layout(.top, to: .bottom, of: titleLabel, offset: labelsOffset)
-        subtitleLabel.layout(to: .left, of: titleLabel)
-        subtitleLabel.layout(to: .right, of: titleLabel)
-        bottomConstraint = subtitleLabel.layoutToSuperview(.bottom, offset: -verticalMargins, priority: .must)
+        stackView.addArrangedSubview(subtitleLabel)
         subtitleLabel.forceContentWrap(.vertically)
     }
     
